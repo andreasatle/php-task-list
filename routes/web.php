@@ -36,9 +36,14 @@ $tasks = [
 ];
 
 // Route to the root of the application
-Route::get('/', function () use ($tasks) {
+Route::get('/tasks', function () use ($tasks) {
     return view('index', ['tasks' => $tasks]);
-});
+})->name('tasks.index');
+
+// Route to the task detail page
+Route::get('/tasks/{id}', function ($id) {
+    return "One single task with id: $id";
+})->name('tasks.show');
 
 Route::fallback(function () {
     return 'Page not found';

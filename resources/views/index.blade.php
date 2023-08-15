@@ -13,7 +13,10 @@
         List of tasks:
         {{-- Special command @forelse for special message when empty list --}}
         @forelse ($tasks as $task)
-            <div>{{ $task->title }}</div>
+            <div>
+                <a href="{{ route('tasks.show', ['id' => $task->id]) }}"> {{ $task->title }}</a>
+            </div>
+
         @empty
             <p>No tasks found</p>
         @endforelse
