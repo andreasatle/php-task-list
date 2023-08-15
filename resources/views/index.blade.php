@@ -10,10 +10,13 @@
 
 <body>
     <div>
-        Hello from template.
-        @isset($message)
-            <p>Message from the web.php: {{ $message }}</p>
-        @endisset
+        List of tasks:
+        {{-- Special command @forelse for special message when empty list --}}
+        @forelse ($tasks as $task)
+            <div>{{ $task->title }}</div>
+        @empty
+            <p>No tasks found</p>
+        @endforelse
     </div>
 </body>
 

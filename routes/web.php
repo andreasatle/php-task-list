@@ -13,9 +13,31 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Temporarily use a class Task, that will be automatically created by some DB magic later.
+class Task
+{
+    public function __construct(
+        public int $id,
+        public string $title,
+        public string $description,
+        public ?string $long_description,
+        public bool $completed = false,
+        public string $created_at,
+        public string $updated_at
+    ) {
+    }
+}
+
+// Create some random tasks, will be read from DB later.
+$tasks = [
+    new Task(1, "Kroger", "Shopping", "For Robyn's birthday party", false, "2021-09-01 12:00:00", "2021-09-01 12:00:00"),
+    new Task(2, "Randalls", "Shopping", "Weekly groceries", false, "2021-09-01 12:00:00", "2021-09-01 12:00:00"),
+    new Task(3, "Whole food", "Shopping", "Monthly groceries", false, "2021-09-01 12:00:00", "2021-09-01 12:00:00")
+];
+
 // Route to the root of the application
-Route::get('/', function () {
-    return view('index', ['message' => "Hello, from web.php"]);
+Route::get('/', function () use ($tasks) {
+    return view('index', ['tasks' => $tasks]);
 });
 
 // Route to the hello page
