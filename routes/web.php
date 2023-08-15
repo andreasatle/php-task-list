@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route to the root of the application
 Route::get('/', function () {
-    return 'Main page';
+    return view('index', ['message' => "Hello, from web.php"]);
 });
 
 // Route to the hello page
