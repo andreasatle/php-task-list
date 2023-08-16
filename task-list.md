@@ -334,3 +334,215 @@ Here's how template inheritance works in Laravel using Blade templates:
    For instance, when you access the route that corresponds to the `home.blade.php` template, Laravel combines the content from `home.blade.php` with the master layout defined in `layout.blade.php`, resulting in a complete HTML page.
 
 Template inheritance simplifies the process of creating and maintaining a consistent user interface across your web application. It promotes code reusability, makes it easier to manage changes to common elements, and enhances the overall development workflow.
+
+# Running a SQL database with brew
+I already have mysql installed with brew on Mac, and its server can be started by:
+```
+brew services start mysql
+```
+Then I can start a mysql client:
+```
+mysql -uroot -p
+```
+
+I can use this database in laravel, by changing the `.env` file in the project root-directory. It is mainly the root password that has to be changed, and the name of the database.
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=task-list
+DB_USERNAME=root
+DB_PASSWORD="<password>"
+```
+
+In order to create (or migrate) the database, we can use:
+```
+php artisan migrate
+```
+and you will be prompted to create a new database.
+
+Next we want to create a new table that corresponds to the model Task in laravel. This can be done with:
+```
+php artisan make:model Task -m
+```
+
+We get a new migration file, which is edited to add the different columns in the table:
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tasks', function (Blueprint $table) {
+            $table->id();
+
+            // Add entries here after created this file with
+            // php artisan make:model Task -m
+            $table->string('title');
+            $table->text('description');
+            $table->text('long_description')->nullable();
+            $table->boolean('completed')->default(false);
+            // End of entries
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tasks');
+    }
+};
+```
+
+## Factories and seeders
+In order to fill the databases with something, we can use Factory methods.
+The boilerplate code already contains a user, and its factory:
+```php
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+```
+
+The name of the class should match the table we are interested in.
+
+The seeder function can be modified to add arbitrary elements in tables:
+```php
+<?php
+
+namespace Database\Seeders;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        \App\Models\User::factory(10)->create();
+
+        // \App\Models\User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+    }
+}
+```
+
+After running
+```
+php artisan db:seed
+```
+the content in task-list:users, are
+```
++----+------------------------+-----------------------------+---------------------+--------------------------------------------------------------+----------------+---------------------+---------------------+
+| id | name                   | email                       | email_verified_at   | password                                                     | remember_token | created_at          | updated_at          |
++----+------------------------+-----------------------------+---------------------+--------------------------------------------------------------+----------------+---------------------+---------------------+
+|  1 | Etha Schinner          | gerhold.rae@example.net     | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | njwn7L6gQI     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  2 | Jordy Hyatt            | fatima84@example.net        | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | 0FXpjkA2S7     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  3 | Janiya Lakin           | anais.mcclure@example.net   | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | wEz9GcxptE     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  4 | Ruth Cruickshank       | boyle.marlene@example.com   | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | HcR93gOxDc     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  5 | Mrs. Alayna Legros     | johnson.stanton@example.net | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | KGe4AkMOtV     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  6 | Mrs. Dominique Kautzer | carolina27@example.net      | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | ySYWgF7lhE     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  7 | Sonya Steuber          | myles11@example.org         | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | juvRy2DXtW     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  8 | Ms. Aaliyah Wisozk V   | nbartoletti@example.org     | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | B3LukOUxR3     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+|  9 | Sonia Upton            | effertz.chaim@example.org   | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | GbPIm35pax     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
+| 10 | Miss Zetta Johns PhD   | auer.adalberto@example.org  | 2023-08-16 19:11:19 | $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi | K1habo2T6E     | 2023-08-16 19:11:19 | 2023-08-16 19:11:19 |
++----+------------------------+-----------------------------+---------------------+--------------------------------------------------------------+----------------+---------------------+---------------------+
+```
+
+## TaskFactory creation
+In order to create a Factory for the Task model, we can use the artisan CLI-command:
+```
+php artisan make:factor TaskFactory --model=Task
+```
+
+This create an empty `TaskFactory`, that we will have to fill:
+```php
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
+ */
+class TaskFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            // Here are the fake definitions for the Task model
+            'title' => fake()->sentence,
+            'description' => fake()->paragraph,
+            'long_description' => fake()->paragraph(7, true),
+            'completed' => fake()->boolean
+        ];
+    }
+}
+```
+
+To add fake data, you can write:
+```
+php artisan db:seed
+```
+as before.
+
+If you want clean data, from scratch, you can use:
+```
+php artisan migrate:refresh --seed
+```
