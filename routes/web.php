@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,14 +36,24 @@ $tasks = [
     new Task(3, "Whole food", "Shopping", "Monthly groceries", false, "2021-09-01 12:00:00", "2021-09-01 12:00:00")
 ];
 
-// Route to the root of the application
+// Route to the home page, redirect to the task list page
+Route::get('/', function () {
+    return redirect()->route('tasks.index');
+});
+
+// Route to the task list page
 Route::get('/tasks', function () use ($tasks) {
     return view('index', ['tasks' => $tasks]);
 })->name('tasks.index');
 
 // Route to the task detail page
-Route::get('/tasks/{id}', function ($id) {
-    return "One single task with id: $id";
+Route::get('/tasks/{id}', function ($id) use ($tasks) {
+    // "Objectify" the task array and match $id
+    $task = collect($tasks)->firstWhere('id', $id);
+    if (!$task) {
+        abort(Response::HTTP_NOT_FOUND, 'Task not found');
+    }
+    return view('show', ['task' => $task]);
 })->name('tasks.show');
 
 Route::fallback(function () {

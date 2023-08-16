@@ -1,26 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
+@section('title', 'List of tasks')
 
-<body>
-    <div>
-        List of tasks:
-        {{-- Special command @forelse for special message when empty list --}}
-        @forelse ($tasks as $task)
-            <div>
-                <a href="{{ route('tasks.show', ['id' => $task->id]) }}"> {{ $task->title }}</a>
-            </div>
-
-        @empty
-            <p>No tasks found</p>
-        @endforelse
-    </div>
-</body>
-
-</html>
+@section('content')
+    @forelse ($tasks as $task)
+        <div>
+            <a href="{{ route('tasks.show', ['id' => $task->id]) }}"> {{ $task->title }}</a>
+        </div>
+    @empty
+        <p>No tasks found</p>
+    @endforelse
+@endsection
