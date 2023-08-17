@@ -26,7 +26,7 @@ Route::get('/', function () {
 Route::get('/tasks', function () {
     // Retrieve all the rows from the DB table, has to be finished
     // by get() that finalizes the SQL-query.
-    return view('index', ['tasks' => Task::latest()->get()]);
+    return view('index', ['tasks' => Task::latest()->paginate(5)]);
 })->name('tasks.index');
 
 // Route to the task creation page
