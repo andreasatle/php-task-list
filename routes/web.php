@@ -2,6 +2,7 @@
 
 use \App\Models\Task;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,11 +28,18 @@ Route::get('/tasks', function () {
     return view('index', ['tasks' => Task::latest()->get()]);
 })->name('tasks.index');
 
+// Route to the task creation page
+Route::view('/tasks/create', 'create')->name('tasks.create');
+
 // Route to the task detail page
 Route::get('/tasks/{id}', function ($id) {
     // Retrieve the row with $id from the DB table
     return view('show', ['task' => Task::findOrFail($id)]);
 })->name('tasks.show');
+
+Route::post('/tasks', function (Request $request) {
+    dd($request->all());
+})->name('tasks.store');
 
 Route::fallback(function () {
     return 'Page not found';
