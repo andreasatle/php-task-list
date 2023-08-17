@@ -546,3 +546,8 @@ If you want clean data, from scratch, you can use:
 ```
 php artisan migrate:refresh --seed
 ```
+
+# Artisan make request, with validation
+```
+php artisan make:request TaskRequest
+```
