@@ -3,34 +3,36 @@
 @section('title', $task->title)
 
 @section('content')
-    <p>{{ $task->description }}</p>
+    <div class="mb-4">
+        <nav class="mb-4">
+            <a href="{{ route('tasks.index') }}" class="link">Back to
+                tasks</a>
+        </nav>
+    </div>
+    <p class="mb-4 text-slate-700">{{ $task->description }}</p>
     @if ($task->long_description)
-        <p>{{ $task->long_description }}</p>
+        <p class="mb-4 text-slate-700">{{ $task->long_description }}</p>
     @endif
-    <p>{{ $task->created_at }}</p>
-    <p>{{ $task->updated_at }}</p>
-    <p>
+    <p class="mb-4 text-sm text-slate-500">Created {{ $task->created_at->diffForHumans() }} •
+        Updated {{ $task->updated_at->diffForHumans() }}</p>
+    <p class="mb-4">
         @if ($task->completed)
-            Completed
+            <span class="font-medium text-green-500">Completed</span>
         @else
-            Incomplete
+            <span class="font-medium text-red-500">Incomplete</span>
         @endif
     </p>
-    <div>
-        <a href="{{ route('tasks.edit', ['task' => $task]) }}">Edit</a>
-    </div>
-    <div>
+    <div class="flex gap-2">
+        <a href="{{ route('tasks.edit', ['task' => $task]) }}" class="btn">Edit</a>
         <form method="POST" action="{{ route('tasks.toggle-complete', ['task' => $task]) }}">
             @csrf
             @method('PUT')
-            <button type="submit">Mark as {{ $task->completed ? 'incomplete' : 'complete' }}</button>
+            <button type="submit" class="btn">Mark as {{ $task->completed ? 'incomplete' : 'complete' }}</button>
         </form>
-    </div>
-    <div>
         <form method="POST" action="{{ route('tasks.destroy', ['task' => $task->id]) }}">
             @csrf
             @method('DELETE')
-            <button type="submit">Delete task</button>
+            <button type="submit" class="btn">Delete task</button>
         </form>
 
     </div>
